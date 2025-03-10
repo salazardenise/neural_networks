@@ -29,7 +29,7 @@ brew install graphviz
 ```
 python3 -m pip list
 ```
-### install libarires in virtual environment
+### install libraries in virtual environment
 ```
 python3 -m pip install -r requirements.txt
 ```
@@ -38,4 +38,4 @@ python3 -m pip install -r requirements.txt
 python3 -m pip freeze > requirements.txt
 ```
 ### demo micgrad
-run demo_micrograd.ipynb in an ipython notebook. 
+run **demo_micrograd.ipynb** in an ipython notebook. 
