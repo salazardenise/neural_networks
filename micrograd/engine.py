@@ -134,10 +134,11 @@ class Value:
         for v in reversed(topo):
             v._backward()
 
-def f(x):
-    return 3*x**2 - 4*x + 5
 
 if __name__ == "__main__":
+    def f(x):
+        return 3*x**2 - 4*x + 5
+    
     # xs = np.arange(-5, 5, 0.25)  # -5 to 5 (not including 5) in steps of 0.25
     # ys = f(xs)
     # plt.plot(xs, ys)
