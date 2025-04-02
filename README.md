@@ -41,7 +41,7 @@ run **demo_micrograd.ipynb** in an ipython notebook.
 ---
 
 ## [makemore](https://www.youtube.com/watch?v=PaCmpygFfXo&list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ&index=2&ab_channel=AndrejKarpathy)
-A neural net that will learn to make more of whatever dataset is supplied. 
+makemore is a neural net that will learn to make more of whatever dataset is supplied. 
 
 Under the hood, makemore is a character level language model. It treats every single line as an example and each example is a sequence of individual characters. It knows how to predict the next character in a sequence. 
 ```
@@ -51,5 +51,12 @@ The **names.txt** file here was taken from Karpathy's [makemore repo](https://gi
 
 ---
 
-## GPT
-This folder contains an exercise builing GPT from scratch.
+## [GPT](https://www.youtube.com/watch?v=kCc8FmEb1nY&list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ&index=7&ab_channel=AndrejKarpathy)
+```
+cd gpt
+```
+This folder contains an exercise builing GPT from scratch. `input.txt` contains the Tiny Shakespeare collection. Run the demo at **gpt.ipynb**
+
+## Future Work
+- train transformer model in gpt folder on gpu
+- try the suggested exercises per lecture
