@@ -1,10 +1,3 @@
-"""
-see papers/blogs:
-- Attention is all you need
-- Deep Residual Learning for Image Recognition
-- https://medium.com/data-science/residual-blocks-building-blocks-of-resnet-fd90ca15d6ec
-"""
-
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
@@ -222,7 +215,16 @@ class DecoderTransformerModel(nn.Module):
             # append sampled index to the running sequence
             idx = torch.cat((idx, idx_next), dim=1)  # (B, T+1), dim=1 is the time dimension
         return idx
-    
+
+print(f'{torch.cuda.is_available()=}, using device {device}')
+if device == 'cuda':
+    print(f'{torch.cuda.device_count()=}') 
+    print(f'{torch.cuda.current_device()=}')
+    print(f'{torch.cuda.get_device_name(torch.cuda.current_device())=}')
+    print('Memory Usage:')
+    print('Allocated:', round(torch.cuda.memory_allocated(torch.cuda.current_device())/1024**3,1), 'GB')
+    print('Cached:   ', round(torch.cuda.memory_reserved(torch.cuda.current_device())/1024**3,1), 'GB')
+
 model = DecoderTransformerModel()
 m = model.to(device)  # moves model parameters to device, important for device cuda
 
@@ -235,6 +237,8 @@ for iter in range(max_iters):
     if iter % eval_interval == 0:
         losses = estimate_loss()
         print(f"step {iter}: train loss {losses['train']:.5f}, vall loss {losses['val']:.4f}")
+        if device == 'cuda':
+            print(torch.cuda.memory_summary())
     # sample a batch of data
     xb, yb = get_batch('train')
     # evaluate the loss

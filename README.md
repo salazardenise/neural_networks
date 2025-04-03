@@ -57,6 +57,31 @@ cd gpt
 ```
 This folder contains an exercise builing GPT from scratch. `input.txt` contains the Tiny Shakespeare collection. Run the demo at **gpt.ipynb**
 
+### Steps to setup GPU instance
+1. Go to AWS account, services, EC2. Click on Launch Instance.
+2. Launch EC2 instance. 
+    - Name: **ML Training**
+    - AMI from catalog: **[Deep Learning OSS Nvidia Driver AMI GPU PyTorch 2.6 (Ubuntu 22.04)](https://aws.amazon.com/releasenotes/aws-deep-learning-ami-gpu-pytorch-2-6-ubuntu-22-04/)** ami-01b288b405fe96ef7 - It is optimized for deep learning and includes PyTorch. Supported EC2 instances: G4dn, G5, G6, Gr6, G6e, P4, P4de, P5, P5e, P5en
+    - Instance type: **g4dn.xlarge**
+    - Key Pair (login): **aws.pem**
+    - Network settings: Network is the VPC you want to launch the instance into. Create security group that will allow SSH traffic from My IP. 
+3. Connect to the instance. ```ssh -i "aws.pem" ubuntu@ec2-instance.us-west-1.compute.amazonaws.com```
+4. Activate pytorch virtual environment venv in the instance. Git clone this repo. Pip install requirements.
+```
+source /opt/pytorch/bin/activate
+git clone https://github.com/salazardenise/neural_networks.git
+python3 -m pip install -r requirements.txt
+```
+5. Try training bigram model. Try training transformer model with current hyperparameters.
+```
+python3 bigram.py
+```
+5. Update hyperparameters for bigger network and run transformer.py.
+```
+vim transformer.py
+```
+6. IMPORTANT: Stop the instance.
+
 ## Future Work
 - train transformer model in gpt folder on gpu
 - try the suggested exercises per lecture
