@@ -50,6 +50,17 @@ n = int(0.9*len(data))  # first 90% will be train, rest val
 train_data = data[:n]
 val_data = data[n:]
 
+def print_cuda_info():
+    print(f'{torch.cuda.is_available()=}, using device {device}')
+    if device == 'cuda':
+        print(f'{torch.cuda.device_count()=}') 
+        print(f'{torch.cuda.current_device()=}')
+        print(f'{torch.cuda.get_device_name(torch.cuda.current_device())=}')
+        print('Memory Usage:')
+        print('Allocated:', round(torch.cuda.memory_allocated(torch.cuda.current_device())/1024**3,1), 'GB')
+        print('Cached:   ', round(torch.cuda.memory_reserved(torch.cuda.current_device())/1024**3,1), 'GB')
+        print(torch.cuda.memory_summary())
+
 # data loading
 def get_batch(split):
     # generate a small batch of data of inputs and targets y
@@ -216,15 +227,8 @@ class DecoderTransformerModel(nn.Module):
             idx = torch.cat((idx, idx_next), dim=1)  # (B, T+1), dim=1 is the time dimension
         return idx
 
-print(f'{torch.cuda.is_available()=}, using device {device}')
-if device == 'cuda':
-    print(f'{torch.cuda.device_count()=}') 
-    print(f'{torch.cuda.current_device()=}')
-    print(f'{torch.cuda.get_device_name(torch.cuda.current_device())=}')
-    print('Memory Usage:')
-    print('Allocated:', round(torch.cuda.memory_allocated(torch.cuda.current_device())/1024**3,1), 'GB')
-    print('Cached:   ', round(torch.cuda.memory_reserved(torch.cuda.current_device())/1024**3,1), 'GB')
 
+print_cuda_info()
 model = DecoderTransformerModel()
 m = model.to(device)  # moves model parameters to device, important for device cuda
 
@@ -237,8 +241,8 @@ for iter in range(max_iters):
     if iter % eval_interval == 0:
         losses = estimate_loss()
         print(f"step {iter}: train loss {losses['train']:.5f}, vall loss {losses['val']:.4f}")
-        if device == 'cuda':
-            print(torch.cuda.memory_summary())
+    if device == 'cuda' and iter % 1000 == 0:
+        print_cuda_info()
     # sample a batch of data
     xb, yb = get_batch('train')
     # evaluate the loss
