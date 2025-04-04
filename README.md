@@ -83,5 +83,4 @@ vim transformer.py
 6. IMPORTANT: Stop the instance.
 
 ## Future Work
-- train transformer model in gpt folder on gpu
 - try the suggested exercises per lecture
