@@ -1,13 +1,27 @@
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
+import torch.profiler as profiler
 
+# # hyperparameters - global variables
+# batch_size = 32  # number of independent sequences to process in parallel
+# block_size = 8  #  the maximum context length for predictions
+# max_iters = 5000
+# eval_interval = 500
+# learning_rate = 1e-3  # self-attention doesn't tolerate high learning rates
+# device = 'cuda' if torch.cuda.is_available() else 'cpu'  # ability to run on a gpu if present, and it'll be faster
+# eval_iters = 200
+# n_embd = 32
+# n_head = 6
+# n_layer = 6
+# dropout = 0.2  # 20% disabled and drop to zero
+# -------------
 # hyperparameters - global variables
-batch_size = 32  # number of independent sequences to process in parallel
-block_size = 8  #  the maximum context length for predictions
-max_iters = 5000
-eval_interval = 500
-learning_rate = 1e-3  # self-attention doesn't tolerate high learning rates
+batch_size = 48  # number of independent sequences to process in parallel
+block_size = 50  #  the maximum context length for predictions
+max_iters = 1000
+eval_interval = 200
+learning_rate = 3e-4  # self-attention doesn't tolerate high learning rates
 device = 'cuda' if torch.cuda.is_available() else 'cpu'  # ability to run on a gpu if present, and it'll be faster
 eval_iters = 200
 n_embd = 32
@@ -29,6 +43,18 @@ dropout = 0.2  # 20% disabled and drop to zero
 # n_layer = 6
 # dropout = 0.2
 # # -------------
+# Profiler
+activities = [profiler.ProfilerActivity.CPU]
+if device == 'cuda':
+    activities.append(profiler.ProfilerActivity.CUDA)
+sort_by_keyword = device + "_time_total"
+prof = profiler.profile(activities=activities, 
+                        #record_shapes=True,  # adds significant profiler overhead
+                        schedule=torch.profiler.schedule(wait=5, warmup=5, active=50),
+                        #on_trace_ready=torch.profiler.tensorboard_trace_handler('./log'),
+                        #with_stack=True,  # adds siginifcant profiler overhead
+)
+# -------------
 
 
 # reproducibility
@@ -235,21 +261,39 @@ model = DecoderTransformerModel().to(device)  # moves model parameters to device
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # training loop
+print("start profiling")
+prof.start()
 for iter in range(max_iters):
     # every once in a while, evaluate the loss on train and val sets
     if iter % eval_interval == 0:
         losses = estimate_loss()
         print(f"step {iter}: train loss {losses['train']:.5f}, vall loss {losses['val']:.4f}")
-    if device == 'cuda' and iter % 1000 == 0:
+    if iter % 1000 == 0:
         print_cuda_info()
     # sample a batch of data
     xb, yb = get_batch('train')
     # evaluate the loss
-    logits, loss = model(xb, yb)
+    with profiler.record_function("MODEL_FORWARD"):
+        logits, loss = model(xb, yb)
     optimizer.zero_grad(set_to_none=True)
-    loss.backward()
-    optimizer.step()
+    with profiler.record_function("MODEL_BACKWARD"):
+        loss.backward()
+    with profiler.record_function("MODEL_UPDATE"):
+        optimizer.step()
+    prof.step()
+prof.stop()
+print("stop profiling")
 
 # generate from the model
+#with profiler.record_function("model_generate"):
+print("generate")
 context = torch.zeros((1,1), dtype=torch.long, device=device)  # make sure to create context on device
 print(decode(model.generate(context, max_new_tokens=500)[0].tolist()))
+print("generate complete")
+
+# Let’s print out the stats for the execution
+print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=50))
+# To get a finer granularity of results and include operator input shapes, pass group_by_input_shape=True (note: this requires running the profiler with record_shapes=True)
+#print(prof.key_averages(group_by_input_shape=True).table(sort_by="cpu_time_total", row_limit=10))
+# Profiler can also be used to analyze performance of models executed on GPUs. (Note: the first use of CUDA profiling may bring an extra overhead.)
+print(prof.key_averages().table(sort_by=sort_by_keyword, row_limit=20))
