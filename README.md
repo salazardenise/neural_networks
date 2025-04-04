@@ -61,7 +61,7 @@ This folder contains an exercise builing GPT from scratch. `input.txt` contains 
 1. Go to AWS account, services, EC2. Click on Launch Instance.
 2. Launch EC2 instance. 
     - Name: **ML Training**
-    - AMI from catalog: **[Deep Learning OSS Nvidia Driver AMI GPU PyTorch 2.6 (Ubuntu 22.04)](https://aws.amazon.com/releasenotes/aws-deep-learning-ami-gpu-pytorch-2-6-ubuntu-22-04/)** ami-01b288b405fe96ef7 - It is optimized for deep learning and includes PyTorch. Supported EC2 instances: G4dn, G5, G6, Gr6, G6e, P4, P4de, P5, P5e, P5en
+    - AMI from catalog: **[Deep Learning OSS Nvidia Driver AMI GPU PyTorch 2.6 (Ubuntu 22.04)](https://aws.amazon.com/releasenotes/aws-deep-learning-ami-gpu-pytorch-2-6-ubuntu-22-04/)** It is optimized for deep learning and includes PyTorch. Supported EC2 instances: G4dn, G5, G6, Gr6, G6e, P4, P4de, P5, P5e, P5en
     - Instance type: **g4dn.xlarge**
     - Key Pair (login): **aws.pem**
     - Network settings: Network is the VPC you want to launch the instance into. Create security group that will allow SSH traffic from My IP. 
