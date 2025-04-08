@@ -82,5 +82,11 @@ vim transformer.py
 ```
 6. IMPORTANT: Stop the instance.
 
+## [Tokenization](https://www.youtube.com/watch?v=zduSFxRajkE&list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ&index=9&ab_channel=AndrejKarpathy)
+```
+cd tokenization
+```
+This folder explores the Byte Pair Encoding algrithm for tokenization.
+
 ## Future Work
 - try the suggested exercises per lecture
